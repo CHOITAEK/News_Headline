@@ -9,7 +9,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
-df = pd. read_csv('./crawling_data/naver_headline_news_4_5_241219.csv')
+df = pd. read_csv('./crawling_data/naver_headline_news_241223.csv')
 df.drop_duplicates(inplace=True)
 df.reset_index(drop=True, inplace=True)
 print(df.head())
@@ -38,7 +38,7 @@ print(labeled_y[:3])
 label = encoder.classes_
 print(label)
 
-with open('./models/encoder.pickle', 'wb')as f:
+with open('./models/encoder.pickle'.format(max), 'wb')as f:
     pickle.dump(encoder, f)
 
 onehot_Y = to_categorical(labeled_y)
@@ -51,7 +51,7 @@ print(X)
 
 stopwords = pd.read_csv('./crawling_data/stopwords.csv', index_col=0)
 print(stopwords)
-
+# 도움이 안되고 방해만 되는 부분을 모아둔 것 stopword
 
 for sentence in range(len(X)):
     words = []
@@ -69,6 +69,15 @@ token.fit_on_texts(X) # low list 만든것
 tokened_X = token.texts_to_sequences(X) #list 형태로 만들어 주는 부분
 wordsize = len(token.word_index) + 1
 print(wordsize)
+
+max = 0
+for i in range(len(tokened_X)):
+    if max < len(tokened_X[i]):
+        max = len(tokened_X[i])
+print(max)
+
+with open('./models/news_token.pickle', 'wb') as f:
+    pickle.dump(token, f)
 
 print(tokened_X[:5])
 
@@ -92,7 +101,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X_pad, onehot_Y, test_size=0
 print(X_train.shape, Y_train.shape)
 print(X_test.shape, Y_test.shape)
 
-np.save('./crawling_data/news_data_X_train_max_{}_wordsize_{}'.format(max, wordsize), X_train)
-np.save('./crawling_data/news_data_Y_train_max_{}_wordsize_{}'.format(max, wordsize), Y_train)
-np.save('./crawling_data/news_data_X_test_max_{}_wordsize_{}'.format(max, wordsize), X_test)
-np.save('./crawling_data/news_data_Y_test_max_{}_wordsize_{}'.format(max, wordsize), Y_test)
+np.save('./crawling_data/news_data_X_train_wordsize_{}_max{}'.format(wordsize, max), X_train)
+np.save('./crawling_data/news_data_Y_train_wordsize_{}_max{}'.format(wordsize, max), Y_train)
+np.save('./crawling_data/news_data_X_test_wordsize_{}_max{}'.format(wordsize, max), X_test)
+np.save('./crawling_data/news_data_Y_test_wordsize_{}_max{}'.format(wordsize, max), Y_test)

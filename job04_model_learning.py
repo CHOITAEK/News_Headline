@@ -1,30 +1,47 @@
-from matplotlib import pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Dropout, Dense, Flatten
-import numpy as np
+# from matplotlib import pyplot as plt
+# from tensorflow.keras.models import Sequential
+# from tensorflow.keras.layers import Embedding, Conv1D, MaxPooling1D, LSTM, Dropout, Dense, Flatten
+# import numpy as np
 
-X_train = np.load('./crawling_data/news_data_X_train_max_14_wordsize_3127.npy', allow_pickle=True)
-X_test = np.load('./crawling_data/news_data_X_test_max_14_wordsize_3127.npy', allow_pickle=True)
-Y_train = np.load('./crawling_data/news_data_Y_train_max_14_wordsize_3127.npy', allow_pickle=True)
-Y_test = np.load('./crawling_data/news_data_Y_test_max_14_wordsize_3127.npy', allow_pickle=True)
+import numpy as np
+import matplotlib.pyplot as plt
+import glob
+
+from keras._tf_keras.keras.models import *
+from keras._tf_keras.keras.layers import *
+from keras._tf_keras.keras.callbacks import *
+from keras._tf_keras.keras.optimizers import Adam
+
+X_train = np.load('./crawling_data/news_data_X_train_wordsize_6666_max19.npy', allow_pickle=True)
+X_test = np.load('./crawling_data/news_data_X_test_wordsize_6666_max19.npy', allow_pickle=True)
+Y_train = np.load('./crawling_data/news_data_Y_train_wordsize_6666_max19.npy', allow_pickle=True)
+Y_test = np.load('./crawling_data/news_data_Y_test_wordsize_6666_max19.npy', allow_pickle=True)
 
 print(X_train.shape, Y_train.shape)
 print(X_test.shape, Y_test.shape)
 
 model = Sequential()
-model.add(Embedding(3127, 300, input_length=14))
+model.add(Embedding(6666, 300)) #각각의 형태소 공간을 벡터화 해주는 레이어가 임베딩 레이어
 model.add(Conv1D(32, kernel_size=5, padding='same', activation='relu'))
-model.add(MaxPooling1D(pool_size=1))
+# 컨브 레이어는 순서 학습 안됨 앞뒤 관계는 학습이 됨
+model.add(MaxPooling1D(pool_size=1)) #conv 따라감
+
 model.add(LSTM(128, activation='tanh', return_sequences=True))
-model.add(Dropout(0.3))
+#rnn은 입력이 2개  LSTM은 activation이 tanh
+model.add(Dropout(0.35))
+
 model.add(LSTM(64, activation='tanh', return_sequences=True))
-model.add(Dropout(0.3))
+model.add(Dropout(0.35))
+
 model.add(LSTM(64, activation='tanh'))
+model.add(Dropout(0.35))
+
 model.add(Flatten())
 model.add(Dense(128, activation='relu'))
-model.add(Dense(2, activation='softmax'))
+model.add(Dropout(0.35))
+model.add(Dense(6, activation='softmax'))
 
-model.build(input_shape=(None, 14))  # 입력 데이터 크기 (None은 배치 크기)
+model.build(input_shape=(None, 19))  # 입력 데이터 크기 (None은 배치 크기)
 model.summary()
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])

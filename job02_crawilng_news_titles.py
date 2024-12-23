@@ -31,7 +31,7 @@ df_titles = pd.DataFrame()
 
 
 # !!!! 여기 range변경
-for k in range(4, 6):
+for k in range(0, 6):
     # 크롤링 한 제목들이 저장될 리스트.
     titles = []
 
@@ -98,6 +98,6 @@ print(df_titles['category'].value_counts())
 # !!!! 여기 이름 뒤쪽의 숫자 변경
 # 파일명에 저장한 시간 추가해서 dataframe을 csv파일로 저장.
 # 시간은 나노초 단위까지 구분 가능하다.
-df_titles.to_csv(f'./crawling_data/naver_headline_news_4_5_{datetime.datetime.now().strftime("%y%m%d")}.csv',
+df_titles.to_csv(f'./crawling_data/naver_headline_news_{datetime.datetime.now().strftime("%y%m%d")}.csv',
                  index=False)
 
